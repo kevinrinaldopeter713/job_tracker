@@ -6,7 +6,7 @@ if(!$conn){
  echo 'connection error:'. mysqli_connect_error();
 }
 
-$sql = 'SELECT email,name,text,tel,file,S1,S2,S3 FROM application_form';
+$sql = 'SELECT email,name,text,tel,file,S1,S2,S3 FROM application_form ORDER BY created_at' ;
         
 // make query and get result
 $result = mysqli_query($conn, $sql);
@@ -19,7 +19,7 @@ mysqli_free_result(($result));
 
 mysqli_close($conn);
 
-print_r($application_form);
+
 
 $email=$name=$text=$tel=$file=$S1=$S2=$S3='';
 $errors= array('email'=>'', 'name'=>'','text'=>'' ,'tel'=>'','file'=>'','S1'=>'','S2'=>'','S3'=>'');
@@ -101,7 +101,23 @@ if(array_filter($errors))
 {
 
 }else{
-    header('Location: index.php');
+
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $text = mysqli_real_escape_string($conn, $_POST['text']);
+    $tel = mysqli_real_escape_string($conn, $_POST['tel']);
+    $file = mysqli_real_escape_string($conn, $_POST['file']);
+    $S1 = mysqli_real_escape_string($conn, $_POST['S1']);
+    $S2 = mysqli_real_escape_string($conn, $_POST['S2']);
+    $S3= mysqli_real_escape_string($conn, $_POST['S3']);
+
+    $sql="INSERT INTO application_form(email,name,text,tel,file,S1,S2,S3) VALUES('$email','$name','$text,'$tel,'$file,'$S1,'$S2','$S3')";
+    if(mysqli_query($conn,$sql))
+    {header('Location: index.php');
+    }else{
+        echo 'query error:'.mysqli_error($conn);
+    }
+    
 }
 }
 ?>
@@ -158,7 +174,7 @@ if(array_filter($errors))
         
           <div class="col-md-6" style="padding-top:25px;">
               <label for="inputresume" class="form-label"  style="padding-right:5px">Resume:</label></br>
-              <input type="file" name="file" value="<?php echo $file?>">
+              <input type="file" name="file" >
               <div style="color:red"><?php echo $errors['file'];?></div>
           </div>
         
