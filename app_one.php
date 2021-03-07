@@ -7,17 +7,7 @@ if(!$conn){
 }
 
 $sql = 'SELECT Email, Applicant_Name, Address , Contact_Number,Attachment FROM job_applications' ;
-
-
-
-
-        
-// make query and get result
 $result = mysqli_query($conn, $sql);
-
-
-
-// fetch the resulting rows as an array
 $job_applications = mysqli_fetch_all($result, MYSQLI_ASSOC);
 mysqli_free_result(($result));
 
@@ -28,24 +18,24 @@ $job_description = mysqli_fetch_all($result2, MYSQLI_ASSOC);
 mysqli_free_result(($result2));
 
 
-$sql3 = 'SELECT email_id FROM login_data';
+$sql3 = 'SELECT full_name FROM login_data';
 $result3 = mysqli_query($conn, $sql3);
 //free result from memory
-$login_data = mysqli_fetch_all($result3, MYSQLI_ASSOC);
+$login_data = mysqli_fetch_all($result3);
 
 mysqli_free_result(($result3));
 
 mysqli_close($conn);
 
-//print_r($job_applications);
+print_r($job_applications);
 
 
 
-$Email=$Applicant_Name=$Address=$Contact_Number=$Attachment=$email_id=$Department=$Title='';
-$errors= array('Email'=>'', 'Applicant_Name'=>'','Address'=>'' ,'Contact_Number'=>'','Attachment'=>'','email_id'=>'','Department'=>'','Title'=>'');
+$Email=$Applicant_Name=$Address=$Contact_Number=$Attachment=$full_name=$Department=$Title='';
+$errors= array('Email'=>'', 'Applicant_Name'=>'','Address'=>'' ,'Contact_Number'=>'','Attachment'=>'','full_name'=>'','Department'=>'','Title'=>'');
 
 if(isset($_POST['submit'])){
-    //echo $_POST['email_id'];
+    //echo $_POST['full_name'];
     //echo $_POST['Applicant_Name'];
     //echo $_POST['Address'];
     //echo $_POST['Contact_Number'];
@@ -93,10 +83,10 @@ if(empty($_POST['Attachment'])){
 }
 
 
-if(!isset($_POST['email_id'])){
-    $errors['email_id']=  'a choice is required ';
+if(!isset($_POST['full_name'])){
+    $errors['full_name']=  'a choice is required ';
 }else{
-    $Save=$_POST['email_id'];
+    $Save=$_POST['full_name'];
 }
 
 if(!isset($_POST['Department'])){
@@ -127,13 +117,13 @@ if(array_filter($errors))
     $Address = mysqli_real_escape_string($conn, $_POST['Address']);
     $Contact_Number = mysqli_real_escape_string($conn, $_POST['Contact_Number']);
     $Attachment = mysqli_real_escape_string($conn, $_POST['Attachment']);
-    $email_id = mysqli_real_escape_string($conn, $_POST['email_id']);
+    $full_name = mysqli_real_escape_string($conn, $_POST['full_name']);
     $Department = mysqli_real_escape_string($conn, $_POST['Department']);
     $Title= mysqli_real_escape_string($conn, $_POST['Title']);
 
-    $sql="INSERT INTO job_applications(Email,Applicant_Name,Address,Contact_Number,Attachment) VALUES('$Email','$Applicant_Name','$Address,'$Contact_Number,'$Attachment,'$email_id,'$Department','$Title')";
+    $sql="INSERT INTO job_applications(Email,Applicant_Name,Address,Contact_Number,Attachment) VALUES('$Email','$Applicant_Name','$Address,'$Contact_Number,'$Attachment')";
     $sql2="INSERT INTO job_description(Department, Title) VALUES('$Department','$Title')";
-    $sql3="INSERT INTO login_data(email_id) VALUES('$email_id')";
+    $sql3="INSERT INTO login_data(full_name) VALUES('$full_name')";
     if(mysqli_query($conn,$sql))
     {header('Location: index.php');
     }else{
@@ -202,7 +192,7 @@ if(array_filter($errors))
         
         <div class="col-md-8" style="padding-top: 25px;">
           <label for="inputperson" class="form-label"  style="padding-right:5px">Person Under Whom You Are Applying:</label>
-          <select name="email_id" id="inputperson" class="form-select">
+          <select name="full_name" id="inputperson" class="form-select">
             <option selected disabled>Choose...</option>
             <option>kevin</option>
             <option>anukreeti</option>
@@ -210,7 +200,7 @@ if(array_filter($errors))
             <option>siddesh</option>
         </select>
         <a style="padding-left:15px;"></a><input class="btn btn-primary" type="button"  value="Save">
-        <div style="color:red"><?php echo $errors['email_id'];?></div>
+        <div style="color:red"><?php echo $errors['full_name'];?></div>
         </div>
 
           <div class="col-md-8" style="padding-top: 25px;">
