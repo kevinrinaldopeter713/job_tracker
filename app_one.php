@@ -1,94 +1,114 @@
 <?php
 
-$conn= mysqli_connect('localhost','job_tracker','job_tracker','job_application_tracker');
+$conn= mysqli_connect('localhost', 'job_application', 'job1234', 'job_application_tracker');
 
 if(!$conn){
  echo 'connection error:'. mysqli_connect_error();
 }
 
-$sql = 'SELECT email,name,text,tel,file,S1,S2,S3 FROM application_form ORDER BY created_at' ;
+$sql = 'SELECT Email, Applicant_Name, Address , Contact_Number,Attachment FROM job_applications' ;
+
+
+
+
         
 // make query and get result
 $result = mysqli_query($conn, $sql);
 
-// fetch the resulting rows as an array
-$application_form = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-//free result from memory
+
+// fetch the resulting rows as an array
+$job_applications = mysqli_fetch_all($result, MYSQLI_ASSOC);
 mysqli_free_result(($result));
+
+$sql2 = 'SELECT Department, Title FROM job_description' ;
+$result2 = mysqli_query($conn, $sql2);
+$job_description = mysqli_fetch_all($result2, MYSQLI_ASSOC);
+
+mysqli_free_result(($result2));
+
+
+$sql3 = 'SELECT email_id FROM login_data';
+$result3 = mysqli_query($conn, $sql3);
+//free result from memory
+$login_data = mysqli_fetch_all($result3, MYSQLI_ASSOC);
+
+mysqli_free_result(($result3));
 
 mysqli_close($conn);
 
+//print_r($job_applications);
 
 
-$email=$name=$text=$tel=$file=$S1=$S2=$S3='';
-$errors= array('email'=>'', 'name'=>'','text'=>'' ,'tel'=>'','file'=>'','S1'=>'','S2'=>'','S3'=>'');
+
+$Email=$Applicant_Name=$Address=$Contact_Number=$Attachment=$email_id=$Department=$Title='';
+$errors= array('Email'=>'', 'Applicant_Name'=>'','Address'=>'' ,'Contact_Number'=>'','Attachment'=>'','email_id'=>'','Department'=>'','Title'=>'');
 
 if(isset($_POST['submit'])){
-    //echo $_POST['email'];
-    //echo $_POST['name'];
-    //echo $_POST['text'];
-    //echo $_POST['tel'];
-    //echo $_POST['file'];
+    //echo $_POST['email_id'];
+    //echo $_POST['Applicant_Name'];
+    //echo $_POST['Address'];
+    //echo $_POST['Contact_Number'];
+    //echo $_POST['Attachment'];
 
-if(empty($_POST['email'])){
-    $errors['email']= 'an email is required </br>';
+if(empty($_POST['Email'])){
+    $errors['Email']= 'an email is required </br>';
 }else{
-    $email=$_POST['email'];
-    if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-        $errors['email']=  'enter a valid email address</br>';
+    $Email=$_POST['Email'];
+    if(!filter_var($Email, FILTER_VALIDATE_EMAIL)){
+        $errors['Email']=  'enter a valid email Address</br>';
     }
 }
 
-if(empty($_POST['name'])){
-    $errors['name']=  'a name is required </br>';
+if(empty($_POST['Applicant_Name'])){
+    $errors['Applicant_Name']=  'a Applicant_Name is required </br>';
 }else{
-    $name=$_POST['name'];
-    if(!preg_match('/^[a-zA-Z\s]+$/',$name)){
-        $errors['name']=  'name must be letters and spaces only</br>';
+    $Applicant_Name=$_POST['Applicant_Name'];
+    if(!preg_match('/^[a-zA-Z\s]+$/',$Applicant_Name)){
+        $errors['Applicant_Name']=  'Applicant_Name must be letters and spaces only</br>';
     }
 }
 
-if(empty($_POST['text'])){
-    $errors['text']=  'an address is required </br>';
+if(empty($_POST['Address'])){
+    $errors['Address']=  'an Address is required </br>';
 }else{
-    $text=$_POST['text'];
-    if(!preg_match('/^[a-zA-Z\s]+$/',$text)){
-        $errors['text']=  'address must be letters and spaces only</br>';
+    $Address=$_POST['Address'];
+    if(!preg_match('/^[a-zA-Z\s]+$/',$Address)){
+        $errors['Address']=  'Address must be letters and spaces only</br>';
     }
 
-if(empty($_POST['tel'])){
-    $errors['tel']=  'an phone number is required</br> ';
+if(empty($_POST['Contact_Number'])){
+    $errors['Contact_Number']=  'an phone number is required</br> ';
 }else{
-    $tel=$_POST['tel'];
-    if(!filter_var($tel, FILTER_VALIDATE_INT)){
-        $errors['tel']=  'phone number must be integers from 0-10 only</br>';
+    $Contact_Number=$_POST['Contact_Number'];
+    if(!filter_var($Contact_Number, FILTER_VALIDATE_INT)){
+        $errors['Contact_Number']=  'phone number must be integers from 0-10 only</br>';
     }
 }
 
-if(empty($_POST['file'])){
-    $errors['file']=  'a file is required ';
+if(empty($_POST['Attachment'])){
+    $errors['Attachment']=  'a Attachment is required ';
 }else{
-    $file=$_POST['file'];
+    $Attachment=$_POST['Attachment'];
 }
 
 
-if(!isset($_POST['S1'])){
-    $errors['S1']=  'a choice is required ';
+if(!isset($_POST['email_id'])){
+    $errors['email_id']=  'a choice is required ';
 }else{
-    $Save=$_POST['S1'];
+    $Save=$_POST['email_id'];
 }
 
-if(!isset($_POST['S2'])){
-    $errors['S2']=  'a choice is required ';
+if(!isset($_POST['Department'])){
+    $errors['Department']=  'a choice is required ';
 }else{
-    $S2=$_POST['S2'];
+    $Department=$_POST['Department'];
 }
 
-if(!isset($_POST['S3'])){
-    $errors['S3']=  'a choice is required ';
+if(!isset($_POST['Title'])){
+    $errors['Title']=  'a choice is required ';
 }else{
-    $S3=$_POST['S3'];
+    $Title=$_POST['Title'];
 }
 
 
@@ -102,16 +122,18 @@ if(array_filter($errors))
 
 }else{
 
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $text = mysqli_real_escape_string($conn, $_POST['text']);
-    $tel = mysqli_real_escape_string($conn, $_POST['tel']);
-    $file = mysqli_real_escape_string($conn, $_POST['file']);
-    $S1 = mysqli_real_escape_string($conn, $_POST['S1']);
-    $S2 = mysqli_real_escape_string($conn, $_POST['S2']);
-    $S3= mysqli_real_escape_string($conn, $_POST['S3']);
+    $Email = mysqli_real_escape_string($conn, $_POST['Email']);
+    $Applicant_Name = mysqli_real_escape_string($conn, $_POST['Applicant_Name']);
+    $Address = mysqli_real_escape_string($conn, $_POST['Address']);
+    $Contact_Number = mysqli_real_escape_string($conn, $_POST['Contact_Number']);
+    $Attachment = mysqli_real_escape_string($conn, $_POST['Attachment']);
+    $email_id = mysqli_real_escape_string($conn, $_POST['email_id']);
+    $Department = mysqli_real_escape_string($conn, $_POST['Department']);
+    $Title= mysqli_real_escape_string($conn, $_POST['Title']);
 
-    $sql="INSERT INTO application_form(email,name,text,tel,file,S1,S2,S3) VALUES('$email','$name','$text,'$tel,'$file,'$S1,'$S2','$S3')";
+    $sql="INSERT INTO job_applications(Email,Applicant_Name,Address,Contact_Number,Attachment) VALUES('$Email','$Applicant_Name','$Address,'$Contact_Number,'$Attachment,'$email_id,'$Department','$Title')";
+    $sql2="INSERT INTO job_description(Department, Title) VALUES('$Department','$Title')";
+    $sql3="INSERT INTO login_data(email_id) VALUES('$email_id')";
     if(mysqli_query($conn,$sql))
     {header('Location: index.php');
     }else{
@@ -132,7 +154,7 @@ if(array_filter($errors))
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="applicant_form.css">
     <!-- FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/csDepartment?family=Montserrat:wght@500&display=swap" rel="stylesheet">
   <!-- FONT Awesome-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
     
@@ -150,37 +172,37 @@ if(array_filter($errors))
         
         <div class="col-md-6" style="padding-top: 25px;">
             <label for="inputname" class="form-label" style="padding-right:5px">Name:</label>
-            <input type="name" name='name' class="form-control" id="inputname" placeholder="Enter your name" value="<?php echo $name?>">
-            <div style="color:red"><?php echo $errors['name'];?></div>
+            <input type="name" name='Applicant_Name' class="form-control" id="inputname" placeholder="Enter your name" value="<?php echo $Applicant_Name?>">
+            <div style="color:red"><?php echo $errors['Applicant_Name'];?></div>
           </div>
         
           <div class="col-md-6" style="padding-top:25px;">
               <label for="inputemail" class="form-label"  style="padding-right:5px">Email Id:</label>
-              <input type="mail" class="form-control" id="inputemail" name="email" placeholder="Enter your Email" value="<?php echo $email?>">
-              <div style="color:red"><?php echo $errors['email'];?></div>
+              <input type="mail" class="form-control" id="inputemail" name="Email" placeholder="Enter your Email" value="<?php echo $Email?>">
+              <div style="color:red"><?php echo $errors['Email'];?></div>
           </div>
 
           <div class="col-md-10" style="padding-top:25px;">
             <label for="inputemail" class="form-label"  style="padding-right:5px">Residential Address:</label>
-            <textarea id ="Address" input type="text" class="form-control" name="text" value="<?php echo $text?>"></textarea>
-            <div style="color:red"><?php echo $errors['text'];?></div>
+            <textarea id ="Address" input type="text" class="form-control" name="Address" value="<?php echo $Address?>"></textarea>
+            <div style="color:red"><?php echo $errors['Address'];?></div>
         </div>
 
         <div class="col-md-6" style="padding-top: 25px;">
             <label for="inputnumber" class="form-label" style="padding-right:5px">Contact Number:</label>
-            <input name="tel" type="tel" class="form-control" id="inputnumber" maxlength="10" minlength="1" value="<?php echo $tel?>">
-            <div style="color:red"><?php echo $errors['tel'];?></div>
+            <input name="Contact_Number" type="tel" class="form-control" id="inputnumber" maxlength="10" minlength="1" value="<?php echo $Contact_Number?>">
+            <div style="color:red"><?php echo $errors['Contact_Number'];?></div>
           </div>
         
           <div class="col-md-6" style="padding-top:25px;">
               <label for="inputresume" class="form-label"  style="padding-right:5px">Resume:</label></br>
-              <input type="file" name="file" >
-              <div style="color:red"><?php echo $errors['file'];?></div>
+              <input type="file" name="Attachment" >
+              <div style="color:red"><?php echo $errors['Attachment'];?></div>
           </div>
         
         <div class="col-md-8" style="padding-top: 25px;">
           <label for="inputperson" class="form-label"  style="padding-right:5px">Person Under Whom You Are Applying:</label>
-          <select name="S1" id="inputperson" class="form-select">
+          <select name="email_id" id="inputperson" class="form-select">
             <option selected disabled>Choose...</option>
             <option>kevin</option>
             <option>anukreeti</option>
@@ -188,12 +210,12 @@ if(array_filter($errors))
             <option>siddesh</option>
         </select>
         <a style="padding-left:15px;"></a><input class="btn btn-primary" type="button"  value="Save">
-        <div style="color:red"><?php echo $errors['S1'];?></div>
+        <div style="color:red"><?php echo $errors['email_id'];?></div>
         </div>
 
           <div class="col-md-8" style="padding-top: 25px;">
             <label for="inputDept" class="form-label"  style="padding-right:5px">Department:</label>
-            <select name="S2" id="inputDept" class="form-select">
+            <select name="Department" id="inputDept" class="form-select">
               <option selected disabled>Choose...</option>
               <option>software</option>
               <option>healthcare</option>
@@ -202,12 +224,12 @@ if(array_filter($errors))
               <option>sales and retail</option>
           </select>
           <a style="padding-left:15px;"></a><input class="btn btn-primary" type="button" value="Save">
-          <div style="color:red"><?php echo $errors['S2'];?></div>
+          <div style="color:red"><?php echo $errors['Department'];?></div>
           </div>
 
           <div class="col-md-8" style="padding-top: 25px;">
             <label for="inputposition" class="form-label"  style="padding-right:5px">Position:</label>
-            <select name='S3' id="inputposition" class="form-select">
+            <select name='Title' id="inputposition" class="form-select">
               <option selected disabled>Choose...</option>
               <option>assistant</option>
               <option>manager</option>
@@ -215,7 +237,7 @@ if(array_filter($errors))
               <option>secretary</option>
           </select>
           <a style="padding-left:15px;"></a><input class="btn btn-primary" type="button" value="Save">
-          <div style="color:red"><?php echo $errors['S3'];?></div>
+          <div style="color:red"><?php echo $errors['Title'];?></div>
         </div>
           
        
